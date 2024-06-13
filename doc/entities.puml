@@ -1,0 +1,86 @@
+@startuml erd
+
+skinparam wrapWidth 300
+skinparam wrapMessageWidth 300
+
+title
+    Entities diagram
+end title
+
+package "Main Service" {
+    entity User {
+        *userId: integer primary_key
+        --
+        *username: text
+        *email: text
+        *hashedPassword: varchar
+        *name: text
+        *surname: text
+        *birthdate: datetime
+        *phone: text
+    }
+}
+
+package "Post Service" {
+    entity Post {
+        *postId: integer primary_key
+        --
+        *userId: integer
+        *content: text
+        *createdAt: datetime
+    }
+
+    entity Comment {
+        *commentId: integer primary_key
+        --
+        *postId: integer
+        *userId: integer
+        *content: text
+        *createdAt: datetime
+    }
+}
+
+package "Stats Service" {
+    entity PostLike { 
+        *postLikeId: integer primary_key
+        --
+        *postId: integer
+        *userId: integer
+    }
+
+    entity PostView { 
+        *postViewId: integer primary_key
+        --
+        *postId: integer
+        *userId: integer
+    }
+
+    entity CommentLike { 
+        *commentLikeId: integer primary_key
+        --
+        *commentId: integer
+        *userId: integer
+    }
+
+    entity CommentView { 
+        *commentViewId: integer primary_key
+        --
+        *commentId: integer
+        *userId: integer
+    }
+}
+
+
+User ||--o{ Post : "creates"
+User ||--o{ Comment : "creates"
+User ||--o{ PostLike : "publishes"
+User ||--o{ PostView : "publishes"
+Post ||--o{ Comment : "has"
+Post ||--o{ PostLike : "has"
+Post ||--o{ PostView : "has"
+User ||--o{ CommentLike : "publishes"
+User ||--o{ CommentView : "publishes"
+Comment ||--o{ CommentLike : "has"
+Comment ||--o{ CommentView : "has"
+
+@enduml
