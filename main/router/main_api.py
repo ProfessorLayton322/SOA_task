@@ -23,7 +23,6 @@ def hash_password(password):
 
 @router.post("/api/signup")
 async def register(db: DatabaseSession, signup_data: AuthData):
-    # return JSONResponse(content={"message" : "Lmao wanna kms"}, status_code=status.HTTP_200_OK)
     user = await get_user_by_username(db, signup_data.username)
     if user is None:
         await create_user(db, signup_data.username, hash_password(signup_data.password))
@@ -78,7 +77,7 @@ def parse_user_params(profile_data: ProfileData):
 
 def check_auth_error(auth_result):
     if auth_result == AuthError.NoSession:
-        return JSONResponse(content={"message": "No session token found, please provide it via 'Session' header"}, status_code=status.HTTP_403_FORBIDDEN)
+        return JSONResponse(content={"message": "No session token found, please provide it via 'Authorization' header"}, status_code=status.HTTP_403_FORBIDDEN)
     if auth_result == AuthError.InvalidSession:
         return JSONResponse(content={"message": "Session token is invalid"}, status_code=status.HTTP_403_FORBIDDEN)
     if auth_result == AuthError.ExpiredSession:
