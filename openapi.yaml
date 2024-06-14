@@ -1,0 +1,185 @@
+openapi: '3.0.0'
+
+info:
+  title: 'Main Service API'
+  version: '1.0.0'
+  description: API that allows to sign up, authenticate and update your user profile
+
+servers:
+  - url: 'http://localhost:32206'
+
+paths:
+  /api/signup:
+    post:
+      summary: 'Register user'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username 
+                - password
+      responses:
+        '200':
+          description: 'User is registered'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '409':
+          description: 'Username taken'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        
+
+  /api/login:
+    post:
+      summary: 'Authorize and create a session'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username 
+                - password
+      responses:
+        '200':
+          description: 'Authorized complete with session created'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    type: string
+                  message:
+                    type: string
+
+        '403':
+          description: 'Unexisting username or wrong password'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/update:
+    put:
+      summary: 'Update user profile'
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                surname:
+                  type: string
+                birthdate:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: 'Profile updated'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+        '403':
+          description: 'Authorize failed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+        '422':
+          description: 'Wrong data format'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/profile:
+    get:
+      summary: 'Get user profile'
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json: {}
+      responses:
+        '200':
+          description: 'Profile description provided'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  birthdate:
+                    type: string
+                  phone:
+                    type: string
+
+        '403':
+          description: 'Authorize failed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: SHA256
