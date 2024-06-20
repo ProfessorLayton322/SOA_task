@@ -1,0 +1,17 @@
+@startuml c4d-systems
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam wrapWidth 300
+skinparam wrapMessageWidth 300
+
+title
+    C4 context diagram
+end title
+
+System(main, "Social network")
+
+Person(user, "User")
+
+Rel(user, main, "User API")
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml C4-container
+skinparam wrapWidth 300
+skinparam wrapMessageWidth 300
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+title
+    C4 container diagram
+end title
+
+Person(user, "User", "Social network user")
+
+System_Boundary(social_network, "Social Network") {
+
+    System_Boundary(main_system, "Main Service System") {
+        Container(main_service, "Main Service", "Python3", "User auth and signup\nUser api for feed")
+        ContainerDb(db_main_service, "Database", "Postgres", "Stores userdata")
+        Rel(main_service, db_main_service, "Write/read userdata")
+    }
+
+    System_Boundary(stat_system, "Stat Service System") {
+        Container(stat_service, "Statistics Service", "Python3", "Statistics service")
+        SystemQueue(stat_service_queue, "Message Broker", "Kafka", "", "")
+        Rel(stat_service_queue, stat_service, "Forwards likes and views to stats service")
+        ContainerDb(db_stat_service, "Database", "ClickHouse", "Stores views and likes data")
+        Rel(stat_service, db_stat_service, "Write/read likes and views")
+    }
+    Rel(main_service, stat_service, "Fetches statistics", "gRPC")
+    Rel(main_service, stat_service_queue, "Writes likes and views to broker")
+
+    System_Boundary(posts_system, "Posts Service System") {
+        Container(posts_service, "Post and Comments Service", "Python3", "Posts service")
+        ContainerDb(db_posts_service, "Database", "Postgres", "Stores posts")
+        Rel(posts_service, db_posts_service, "Write/read posts")
+    }
+    Rel(main_service, posts_service, "Feed and posts interaction", "gRPC")
+}
+
+Container(frontend, "Frontend", "")
+Rel(user, frontend, "Uses")
+Rel(frontend, main_service, "Uses", "REST API")
+@enduml
