@@ -84,7 +84,7 @@ def check_auth_error(auth_result):
         return JSONResponse(content={"message": "Session has expired, please log in once more via /api/login"}, status_code=status.HTTP_403_FORBIDDEN)
     return None
 
-@router.put("/api/update")
+@router.put("/api/profile")
 async def update_user_profile(db: DatabaseSession, profile_data: ProfileData, authorization: Annotated[str, Header()] = None):
     auth_result = await authorize(db, authorization)
     auth_error = check_auth_error(auth_result)

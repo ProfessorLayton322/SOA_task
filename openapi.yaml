@@ -85,7 +85,7 @@ paths:
                   message:
                     type: string
 
-  /api/update:
+  /api/profile:
     put:
       summary: 'Update user profile'
       security:
