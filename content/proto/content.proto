@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package content_service;
+
+option go_package = "proto/;content_service";
+
+message CreatePostRequest {
+    uint64 author_id = 1;
+    string content = 2;
+}
+
+message PostId {
+    uint64 post_id = 1;
+}
+
+message EditPostRequest {
+    uint64 author_id = 1;
+    uint64 post_id = 2;
+    string new_content = 3;
+}
+
+message EditResponse {
+    enum Result {
+        Ok = 0;
+        MissingPost = 1;
+        NoPermission = 2;
+    }
+    Result result = 1;
+}
+
+message ReadPostRequest {
+    uint64 author_id = 1;
+    uint64 post_id = 2;
+}
+
+message Post {
+    string content = 1;
+    google.protobuf.Timestamp created = 2;
+    google.protobuf.Timestamp edited = 3;
+}
+
+message ReadResponse {
+    enum Status {
+        Ok = 0;
+        MissingPost = 1;
+        NoPermission = 2;
+    }
+    Status status = 1;
+    Post post = 2;
+}
+
+message DeletePostRequest {
+    uint64 author_id = 1;
+    uint64 post_id = 2;
+}
+
+message DeleteResponse {
+    enum Result {
+        Ok = 0;
+        MissingPost = 1;
+        NoPermission = 2;
+    }
+    Result result = 1;
+}
+
+message ListRequest {
+    uint64 author_id = 1;
+    uint64 page_size = 2;
+    uint64 offset = 3;
+}
+
+message ListResponse {
+    repeated Post posts = 1;
+}
+
+service ContentService {
+   rpc CreatePost(CreatePostRequest) returns (PostId) {}
+   rpc EditPost(EditPostRequest) returns (EditResponse) {}
+   rpc ReadPost(ReadPostRequest) returns (ReadResponse) {}
+   rpc DeletePost(DeletePostRequest) returns (DeleteResponse) {}
+   rpc List(ListRequest) returns (ListResponse) {}
+}
