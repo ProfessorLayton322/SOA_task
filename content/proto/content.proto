@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package content_service;
+
+option go_package = "proto/;content_service";
+
+message CreatePostRequest {
+    uint64 author_id = 1;
+    string content = 2;
+}
+
+message PostId {
+    uint64 post_id = 1;
+}
+
+service ContentService {
+   rpc CreatePost(CreatePostRequest) returns (PostId) {}
+}

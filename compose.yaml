@@ -1,16 +1,5 @@
 version: "3.9"
 services:
-  main_service:
-    build: ./main
-    environment:
-      PORT: 32206
-      POSTGRES_URL: "postgresql+asyncpg://MASTER:MASTER@main_db:32402/MAIN_DB"
-    ports:
-      - "32206:32206"
-    restart: unless-stopped
-    depends_on:
-      - main_db
-
   main_db:
     image: postgres
     environment:
@@ -25,5 +14,43 @@ services:
     volumes:
       - main_db_data:/data/postgres
 
+  content_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: CONTENT
+      POSTGRES_PASSWORD: CONTENT
+      PGDATA: /data/postgres
+      POSTGRES_DB: CONTENT_DB 
+      PGPORT: 32004
+    ports:
+      - "32004:32004"
+    restart: unless-stopped
+    volumes:
+      - content_db_data:/data/postgres
+
+  main_service:
+    build: ./main
+    environment:
+      PORT: 32206
+      POSTGRES_URL: "postgresql+asyncpg://MASTER:MASTER@main_db:32402/MAIN_DB"
+    ports:
+      - "32206:32206"
+    restart: unless-stopped
+    depends_on:
+      - main_db
+      - content_service
+
+  content_service:
+    build: ./content
+    environment:
+      PORT: 32406
+      POSTGRES_URL: "postgresql+asyncpg://CONTENT:CONTENT@content_db:32004/CONTENT_DB"
+    ports:
+      - "32406:32406"
+    restart: unless-stopped
+    depends_on:
+      - content_db
+
 volumes:
   main_db_data:
+  content_db_data:
