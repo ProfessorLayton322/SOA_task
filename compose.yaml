@@ -5,6 +5,7 @@ services:
     environment:
       PORT: 32206
       POSTGRES_URL: "postgresql+asyncpg://MASTER:MASTER@main_db:32402/MAIN_DB"
+      CONTENT_SERVICE_ADDR: "content_service:32406"
     ports:
       - "32206:32206"
     restart: unless-stopped
@@ -13,6 +14,8 @@ services:
         condition: service_healthy
       content_service:
         condition: service_started
+    volumes:
+      - ./content/proto:/main/content_proto
 
   content_service:
     build: ./content

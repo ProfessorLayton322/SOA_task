@@ -4,10 +4,12 @@ import uvicorn
 from os import environ as env
 from os import system
 
-from router.main_api import router as main_api
+from routers.user_api.main_api import router as main_api
+from routers.post_api.post_api import router as post_api
 
 app = FastAPI()
 app.include_router(main_api)
+app.include_router(post_api)
 
 PORT = int(env.get("PORT"))
 

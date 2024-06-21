@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from email_validator import validate_email
 
 from db.db_session import DatabaseSession
-from .db_actions import get_user_by_username, get_user_by_id, create_user, update_profile, create_session, authorize, AuthError
+from db.db_actions import get_user_by_username, get_user_by_id, create_user, update_profile, create_session, authorize, AuthError
 
 import hashlib
 
@@ -18,11 +18,24 @@ router = APIRouter()
 class AuthData(BaseModel):
     username: str
     password: str
+
 def hash_password(password):
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
 
+from os import environ as env
+from content_proto.content_pb2_grpc import *
+from content_proto.content_pb2 import *
+import grpc
+
+#grpc_channel = grpc.insecure_channel(env.get("CONTENT_SERVICE_ADDR"))
+#grpc_stub = ContentServiceStub(grpc_channel)
+
 @router.post("/api/signup")
 async def register(db: DatabaseSession, signup_data: AuthData):
+    #temp = grpc_stub.CreatePost(CreatePostRequest(
+    #    author_id = 15,
+    #    content = "Hello world!!!"
+    #))
     user = await get_user_by_username(db, signup_data.username)
     if user is None:
         await create_user(db, signup_data.username, hash_password(signup_data.password))

@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import proto.content_pb2 as content__pb2
+from . import content_pb2 as content__pb2
 
 GRPC_GENERATED_VERSION = '1.64.1'
 GRPC_VERSION = grpc.__version__
