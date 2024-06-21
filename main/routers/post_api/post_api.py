@@ -88,6 +88,13 @@ async def delete_post(db: DatabaseSession, request: DeleteData, authorization: A
     return JSONResponse(content={"message" : "Deleted successfully"}, status_code=status.HTTP_200_OK)
 
 
+def proto_to_dict(post):
+    return {
+        "content" : post.content, 
+        "created" : post.created.ToDatetime().isoformat(),
+        "edited" : post.edited.ToDatetime().isoformat()
+    }
+
 class ReadData(BaseModel):
     post_id: int
 
@@ -103,13 +110,29 @@ async def read_post(db: DatabaseSession, request: ReadData, authorization: Annot
         post_id = request.post_id,
     ))
     if response.status == ReadResponse.Status.Ok:
-        return JSONResponse(content={
-            "content" : response.content, 
-            "created" : response.created.ToDatetime().isoformat(),
-            "edited" : response.edited.ToDatetime().isoformat()
-        }, status_code=status.HTTP_200_OK)
+        return JSONResponse(content=proto_to_dict(response.post), status_code=status.HTTP_200_OK)
     if response.status == ReadResponse.Status.NoPermission:
         return JSONResponse(content={"message" : "You can't edit other people's posts"}, status_code=status.HTTP_403_FORBIDDEN)
     if response.status == ReadResponse.Status.MissingPost:
         return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
 
+class ListData(BaseModel):
+    page_size: int
+    offset: int
+
+@router.get("/api/list")
+async def list(db: DatabaseSession, request: ListData, authorization: Annotated[str, Header()] = None):
+    auth_result = await authorize(db, authorization)
+    auth_error = check_auth_error(auth_result)
+    if auth_error is not None:
+        return auth_error
+    user_id = auth_result
+    response = grpc_stub.List(ListRequest(
+        author_id = user_id,
+        page_size=request.page_size,
+        offset=request.offset
+    ))
+    answer = []
+    for post in response.posts:
+        answer.append(proto_to_dict(post))
+    return JSONResponse(content={"posts" : answer}, status_code=status.HTTP_200_OK)

@@ -3,7 +3,7 @@ from os import system
 from datetime import datetime
 
 import grpc
-from proto.content_pb2 import PostId, EditResponse, ReadResponse, DeleteResponse
+from proto.content_pb2 import Post, PostId, EditResponse, ReadResponse, DeleteResponse, ListResponse
 from proto import content_pb2_grpc
 from concurrent import futures
 import asyncio
@@ -18,6 +18,17 @@ async def get_post(db, post_id):
     if len(result) == 0:
         return None
     return result[0]
+
+def dict_to_proto(post):
+    created = Timestamp()
+    created.FromDatetime(post["created"])
+    edited = Timestamp()
+    edited.FromDatetime(post["edited"])
+    return Post(
+        content=post["content"],
+        created=created,
+        edited=edited
+    )
 
 class ContentService(content_pb2_grpc.ContentServiceServicer):
     async def CreatePost(self, request, context):
@@ -92,16 +103,23 @@ class ContentService(content_pb2_grpc.ContentServiceServicer):
                 return ReadResponse(status=ReadResponse.Status.MissingPost)
             if post["user_id"] != request.author_id:
                 return ReadResponse(status=ReadResponse.Status.NoPermission)
-            created = Timestamp()
-            created.FromDatetime(post["created"])
-            edited = Timestamp()
-            edited.FromDatetime(post["edited"])
             return ReadResponse(
                 status=ReadResponse.Status.Ok,
-                content=post["content"],
-                created=created,
-                edited=edited
+                post=dict_to_proto(post)
             )
+        except Exception as exception:
+            await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+
+    async def List(self, request, context):
+        try:
+            db = SessionLocal()
+            posts = post_table.select().where(post_table.c.user_id == request.author_id).order_by(
+                post_table.c.edited.desc()).offset(request.offset).limit(request.page_size)
+            result = (await db.execute(posts)).mappings().all()
+            response = ListResponse()
+            for post in result:
+                response.posts.append(dict_to_proto(post))
+            return response
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
 
