@@ -47,8 +47,23 @@ message ReadResponse {
     google.protobuf.Timestamp edited = 4;
 }
 
+message DeletePostRequest {
+    uint64 author_id = 1;
+    uint64 post_id = 2;
+}
+
+message DeleteResponse {
+    enum Result {
+        Ok = 0;
+        MissingPost = 1;
+        NoPermission = 2;
+    }
+    Result result = 1;
+}
+
 service ContentService {
    rpc CreatePost(CreatePostRequest) returns (PostId) {}
    rpc EditPost(EditPostRequest) returns (EditResponse) {}
    rpc ReadPost(ReadPostRequest) returns (ReadResponse) {}
+   rpc DeletePost(DeletePostRequest) returns (DeleteResponse) {}
 }

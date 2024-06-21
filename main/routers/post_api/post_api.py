@@ -50,7 +50,7 @@ class EditData(BaseModel):
     post_id: int
 
 @router.put("/api/post")
-async def create_post(db: DatabaseSession, request: EditData, authorization: Annotated[str, Header()] = None):
+async def edit_post(db: DatabaseSession, request: EditData, authorization: Annotated[str, Header()] = None):
     auth_result = await authorize(db, authorization)
     auth_error = check_auth_error(auth_result)
     if auth_error is not None:
@@ -66,6 +66,27 @@ async def create_post(db: DatabaseSession, request: EditData, authorization: Ann
     if response.result == EditResponse.Result.MissingPost:
         return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message" : "Edited successfully"}, status_code=status.HTTP_200_OK)
+
+class DeleteData(BaseModel):
+    post_id: int
+
+@router.delete("/api/post")
+async def delete_post(db: DatabaseSession, request: DeleteData, authorization: Annotated[str, Header()] = None):
+    auth_result = await authorize(db, authorization)
+    auth_error = check_auth_error(auth_result)
+    if auth_error is not None:
+        return auth_error
+    user_id = auth_result
+    response = grpc_stub.DeletePost(EditPostRequest(
+        author_id = user_id,
+        post_id = request.post_id
+    ))
+    if response.result == DeleteResponse.Result.NoPermission:
+        return JSONResponse(content={"message" : "You can't delete other people's posts"}, status_code=status.HTTP_403_FORBIDDEN)
+    if response.result == DeleteResponse.Result.MissingPost:
+        return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
+    return JSONResponse(content={"message" : "Deleted successfully"}, status_code=status.HTTP_200_OK)
+
 
 class ReadData(BaseModel):
     post_id: int

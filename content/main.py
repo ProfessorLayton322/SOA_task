@@ -3,7 +3,7 @@ from os import system
 from datetime import datetime
 
 import grpc
-from proto.content_pb2 import PostId, EditResponse, ReadResponse
+from proto.content_pb2 import PostId, EditResponse, ReadResponse, DeleteResponse
 from proto import content_pb2_grpc
 from concurrent import futures
 import asyncio
@@ -53,6 +53,28 @@ class ContentService(content_pb2_grpc.ContentServiceServicer):
                 content=request.new_content,
                 edited=timestamp
             )
+            await db.execute(query)
+            await db.commit()
+
+            response = EditResponse()
+            response.result = EditResponse.Result.Ok
+            return response
+        except Exception as exception:
+            await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+
+    async def DeletePost(self, request, context):
+        try:
+            db = SessionLocal()
+            post = await get_post(db, request.post_id)
+            if post is None:
+                response = DeleteResponse()
+                response.result = DeleteResponse.Result.MissingPost
+                return response
+            if post["user_id"] != request.author_id:
+                response = DeleteResponse()
+                response.result = DeleteResponse.Result.NoPermission
+                return response
+            query = post_table.delete().where(post_table.c.id == request.post_id)
             await db.execute(query)
             await db.commit()
 

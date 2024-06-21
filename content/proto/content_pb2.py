@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcontent.proto\x12\x0f\x63ontent_service\x1a\x1fgoogle/protobuf/timestamp.proto\"7\n\x11\x43reatePostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"\x19\n\x06PostId\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\"J\n\x0f\x45\x64itPostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\x12\x13\n\x0bnew_content\x18\x03 \x01(\t\"y\n\x0c\x45\x64itResponse\x12\x34\n\x06result\x18\x01 \x01(\x0e\x32$.content_service.EditResponse.Result\"3\n\x06Result\x12\x06\n\x02Ok\x10\x00\x12\x0f\n\x0bMissingPost\x10\x01\x12\x10\n\x0cNoPermission\x10\x02\"5\n\x0fReadPostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\"\xe3\x01\n\x0cReadResponse\x12\x34\n\x06status\x18\x01 \x01(\x0e\x32$.content_service.ReadResponse.Status\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12+\n\x07\x63reated\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12*\n\x06\x65\x64ited\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"3\n\x06Status\x12\x06\n\x02Ok\x10\x00\x12\x0f\n\x0bMissingPost\x10\x01\x12\x10\n\x0cNoPermission\x10\x02\x32\xfb\x01\n\x0e\x43ontentService\x12K\n\nCreatePost\x12\".content_service.CreatePostRequest\x1a\x17.content_service.PostId\"\x00\x12M\n\x08\x45\x64itPost\x12 .content_service.EditPostRequest\x1a\x1d.content_service.EditResponse\"\x00\x12M\n\x08ReadPost\x12 .content_service.ReadPostRequest\x1a\x1d.content_service.ReadResponse\"\x00\x42\x18Z\x16proto/;content_serviceb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcontent.proto\x12\x0f\x63ontent_service\x1a\x1fgoogle/protobuf/timestamp.proto\"7\n\x11\x43reatePostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"\x19\n\x06PostId\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\"J\n\x0f\x45\x64itPostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\x12\x13\n\x0bnew_content\x18\x03 \x01(\t\"y\n\x0c\x45\x64itResponse\x12\x34\n\x06result\x18\x01 \x01(\x0e\x32$.content_service.EditResponse.Result\"3\n\x06Result\x12\x06\n\x02Ok\x10\x00\x12\x0f\n\x0bMissingPost\x10\x01\x12\x10\n\x0cNoPermission\x10\x02\"5\n\x0fReadPostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\"\xe3\x01\n\x0cReadResponse\x12\x34\n\x06status\x18\x01 \x01(\x0e\x32$.content_service.ReadResponse.Status\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12+\n\x07\x63reated\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12*\n\x06\x65\x64ited\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"3\n\x06Status\x12\x06\n\x02Ok\x10\x00\x12\x0f\n\x0bMissingPost\x10\x01\x12\x10\n\x0cNoPermission\x10\x02\"7\n\x11\x44\x65letePostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\"}\n\x0e\x44\x65leteResponse\x12\x36\n\x06result\x18\x01 \x01(\x0e\x32&.content_service.DeleteResponse.Result\"3\n\x06Result\x12\x06\n\x02Ok\x10\x00\x12\x0f\n\x0bMissingPost\x10\x01\x12\x10\n\x0cNoPermission\x10\x02\x32\xd0\x02\n\x0e\x43ontentService\x12K\n\nCreatePost\x12\".content_service.CreatePostRequest\x1a\x17.content_service.PostId\"\x00\x12M\n\x08\x45\x64itPost\x12 .content_service.EditPostRequest\x1a\x1d.content_service.EditResponse\"\x00\x12M\n\x08ReadPost\x12 .content_service.ReadPostRequest\x1a\x1d.content_service.ReadResponse\"\x00\x12S\n\nDeletePost\x12\".content_service.DeletePostRequest\x1a\x1f.content_service.DeleteResponse\"\x00\x42\x18Z\x16proto/;content_serviceb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,6 +39,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_READRESPONSE']._serialized_end=633
   _globals['_READRESPONSE_STATUS']._serialized_start=582
   _globals['_READRESPONSE_STATUS']._serialized_end=633
-  _globals['_CONTENTSERVICE']._serialized_start=636
-  _globals['_CONTENTSERVICE']._serialized_end=887
+  _globals['_DELETEPOSTREQUEST']._serialized_start=635
+  _globals['_DELETEPOSTREQUEST']._serialized_end=690
+  _globals['_DELETERESPONSE']._serialized_start=692
+  _globals['_DELETERESPONSE']._serialized_end=817
+  _globals['_DELETERESPONSE_RESULT']._serialized_start=297
+  _globals['_DELETERESPONSE_RESULT']._serialized_end=348
+  _globals['_CONTENTSERVICE']._serialized_start=820
+  _globals['_CONTENTSERVICE']._serialized_end=1156
 # @@protoc_insertion_point(module_scope)
