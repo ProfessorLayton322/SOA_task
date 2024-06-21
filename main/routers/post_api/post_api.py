@@ -29,11 +29,11 @@ def check_auth_error(auth_result):
         return JSONResponse(content={"message": "Session has expired, please log in once more via /api/login"}, status_code=status.HTTP_403_FORBIDDEN)
     return None
 
-class CreateCommentRequest(BaseModel):
+class CreateData(BaseModel):
     content: str
 
 @router.post("/api/post")
-async def create_post(db: DatabaseSession, request: CreateCommentRequest, authorization: Annotated[str, Header()] = None):
+async def create_post(db: DatabaseSession, request: CreateData, authorization: Annotated[str, Header()] = None):
     auth_result = await authorize(db, authorization)
     auth_error = check_auth_error(auth_result)
     if auth_error is not None:
@@ -45,11 +45,12 @@ async def create_post(db: DatabaseSession, request: CreateCommentRequest, author
     ))
     return JSONResponse(content={"comment_id" : response.post_id}, status_code=status.HTTP_200_OK)
 
-class EditCommentRequest(BaseModel):
+class EditData(BaseModel):
     new_content: str
     post_id: int
+
 @router.put("/api/post")
-async def create_post(db: DatabaseSession, request: EditCommentRequest, authorization: Annotated[str, Header()] = None):
+async def create_post(db: DatabaseSession, request: EditData, authorization: Annotated[str, Header()] = None):
     auth_result = await authorize(db, authorization)
     auth_error = check_auth_error(auth_result)
     if auth_error is not None:
@@ -65,4 +66,29 @@ async def create_post(db: DatabaseSession, request: EditCommentRequest, authoriz
     if response.result == EditResponse.Result.MissingPost:
         return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"message" : "Edited successfully"}, status_code=status.HTTP_200_OK)
+
+class ReadData(BaseModel):
+    post_id: int
+
+@router.get("/api/post")
+async def read_post(db: DatabaseSession, request: ReadData, authorization: Annotated[str, Header()] = None):
+    auth_result = await authorize(db, authorization)
+    auth_error = check_auth_error(auth_result)
+    if auth_error is not None:
+        return auth_error
+    user_id = auth_result
+    response = grpc_stub.ReadPost(ReadPostRequest(
+        author_id = user_id,
+        post_id = request.post_id,
+    ))
+    if response.status == ReadResponse.Status.Ok:
+        return JSONResponse(content={
+            "content" : response.content, 
+            "created" : response.created.ToDatetime().isoformat(),
+            "edited" : response.edited.ToDatetime().isoformat()
+        }, status_code=status.HTTP_200_OK)
+    if response.status == ReadResponse.Status.NoPermission:
+        return JSONResponse(content={"message" : "You can't edit other people's posts"}, status_code=status.HTTP_403_FORBIDDEN)
+    if response.status == ReadResponse.Status.MissingPost:
+        return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
 

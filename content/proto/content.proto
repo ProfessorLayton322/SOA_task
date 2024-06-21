@@ -30,7 +30,25 @@ message EditResponse {
     Result result = 1;
 }
 
+message ReadPostRequest {
+    uint64 author_id = 1;
+    uint64 post_id = 2;
+}
+
+message ReadResponse {
+    enum Status {
+        Ok = 0;
+        MissingPost = 1;
+        NoPermission = 2;
+    }
+    Status status = 1;
+    string content = 2;
+    google.protobuf.Timestamp created = 3;
+    google.protobuf.Timestamp edited = 4;
+}
+
 service ContentService {
    rpc CreatePost(CreatePostRequest) returns (PostId) {}
    rpc EditPost(EditPostRequest) returns (EditResponse) {}
+   rpc ReadPost(ReadPostRequest) returns (ReadResponse) {}
 }

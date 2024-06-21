@@ -49,6 +49,11 @@ class ContentServiceStub(object):
                 request_serializer=content__pb2.EditPostRequest.SerializeToString,
                 response_deserializer=content__pb2.EditResponse.FromString,
                 _registered_method=True)
+        self.ReadPost = channel.unary_unary(
+                '/content_service.ContentService/ReadPost',
+                request_serializer=content__pb2.ReadPostRequest.SerializeToString,
+                response_deserializer=content__pb2.ReadResponse.FromString,
+                _registered_method=True)
 
 
 class ContentServiceServicer(object):
@@ -66,6 +71,12 @@ class ContentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReadPost(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ContentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -78,6 +89,11 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     servicer.EditPost,
                     request_deserializer=content__pb2.EditPostRequest.FromString,
                     response_serializer=content__pb2.EditResponse.SerializeToString,
+            ),
+            'ReadPost': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReadPost,
+                    request_deserializer=content__pb2.ReadPostRequest.FromString,
+                    response_serializer=content__pb2.ReadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -134,6 +150,33 @@ class ContentService(object):
             '/content_service.ContentService/EditPost',
             content__pb2.EditPostRequest.SerializeToString,
             content__pb2.EditResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ReadPost(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/content_service.ContentService/ReadPost',
+            content__pb2.ReadPostRequest.SerializeToString,
+            content__pb2.ReadResponse.FromString,
             options,
             channel_credentials,
             insecure,

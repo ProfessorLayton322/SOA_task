@@ -3,7 +3,7 @@ from os import system
 from datetime import datetime
 
 import grpc
-from proto.content_pb2 import PostId, EditResponse
+from proto.content_pb2 import PostId, EditResponse, ReadResponse
 from proto import content_pb2_grpc
 from concurrent import futures
 import asyncio
@@ -59,6 +59,27 @@ class ContentService(content_pb2_grpc.ContentServiceServicer):
             response = EditResponse()
             response.result = EditResponse.Result.Ok
             return response
+        except Exception as exception:
+            await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+
+    async def ReadPost(self, request, context):
+        try:
+            db = SessionLocal()
+            post = await get_post(db, request.post_id)
+            if post is None:
+                return ReadResponse(status=ReadResponse.Status.MissingPost)
+            if post["user_id"] != request.author_id:
+                return ReadResponse(status=ReadResponse.Status.NoPermission)
+            created = Timestamp()
+            created.FromDatetime(post["created"])
+            edited = Timestamp()
+            edited.FromDatetime(post["edited"])
+            return ReadResponse(
+                status=ReadResponse.Status.Ok,
+                content=post["content"],
+                created=created,
+                edited=edited
+            )
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
 
