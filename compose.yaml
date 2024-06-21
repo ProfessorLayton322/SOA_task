@@ -1,5 +1,31 @@
 version: "3.9"
 services:
+  main_service:
+    build: ./main
+    environment:
+      PORT: 32206
+      POSTGRES_URL: "postgresql+asyncpg://MASTER:MASTER@main_db:32402/MAIN_DB"
+    ports:
+      - "32206:32206"
+    restart: unless-stopped
+    depends_on:
+      main_db:
+        condition: service_healthy
+      content_service:
+        condition: service_started
+
+  content_service:
+    build: ./content
+    environment:
+      PORT: 32406
+      POSTGRES_URL: "postgresql+asyncpg://CONTENT:CONTENT@content_db:32004/CONTENT_DB"
+    ports:
+      - "32406:32406"
+    restart: unless-stopped
+    depends_on:
+      content_db:
+        condition: service_healthy
+
   main_db:
     image: postgres
     environment:
@@ -11,6 +37,11 @@ services:
     ports:
       - "32402:32402"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - main_db_data:/data/postgres
 
@@ -25,31 +56,13 @@ services:
     ports:
       - "32004:32004"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - content_db_data:/data/postgres
-
-  main_service:
-    build: ./main
-    environment:
-      PORT: 32206
-      POSTGRES_URL: "postgresql+asyncpg://MASTER:MASTER@main_db:32402/MAIN_DB"
-    ports:
-      - "32206:32206"
-    restart: unless-stopped
-    depends_on:
-      - main_db
-      - content_service
-
-  content_service:
-    build: ./content
-    environment:
-      PORT: 32406
-      POSTGRES_URL: "postgresql+asyncpg://CONTENT:CONTENT@content_db:32004/CONTENT_DB"
-    ports:
-      - "32406:32406"
-    restart: unless-stopped
-    depends_on:
-      - content_db
 
 volumes:
   main_db_data:
