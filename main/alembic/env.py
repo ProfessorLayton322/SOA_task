@@ -19,7 +19,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 ini_section = config.config_ini_section
-config.set_section_option(ini_section, "POSTGRES_URL", env.get("POSTGRES_URL"))
+config.set_section_option(ini_section, "POSTGRES_URL", env.get("POSTGRES_URL").replace("+asyncpg", ""))
 
 # add your model's MetaData object here
 # for 'autogenerate' support
