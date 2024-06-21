@@ -3,7 +3,7 @@ from os import system
 from datetime import datetime
 
 import grpc
-from proto.content_pb2 import PostId
+from proto.content_pb2 import PostId, EditResponse
 from proto import content_pb2_grpc
 from concurrent import futures
 import asyncio
@@ -11,6 +11,13 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from db.db_session import SessionLocal
 from db.models import posts as post_table
+
+async def get_post(db, post_id):
+    query = post_table.select().where(post_table.c.id == post_id)
+    result = (await db.execute(query)).mappings().all()
+    if len(result) == 0:
+        return None
+    return result[0]
 
 class ContentService(content_pb2_grpc.ContentServiceServicer):
     async def CreatePost(self, request, context):
@@ -26,6 +33,32 @@ class ContentService(content_pb2_grpc.ContentServiceServicer):
             result = await db.execute(query)
             await db.commit()
             return PostId(post_id=result.inserted_primary_key[0])
+        except Exception as exception:
+            await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+
+    async def EditPost(self, request, context):
+        try:
+            db = SessionLocal()
+            post = await get_post(db, request.post_id)
+            if post is None:
+                response = EditResponse()
+                response.result = EditResponse.Result.MissingPost
+                return response
+            if post["user_id"] != request.author_id:
+                response = EditResponse()
+                response.result = EditResponse.Result.NoPermission
+                return response
+            timestamp = datetime.now()
+            query = post_table.update().where(post_table.c.id == request.post_id).values(
+                content=request.new_content,
+                edited=timestamp
+            )
+            await db.execute(query)
+            await db.commit()
+
+            response = EditResponse()
+            response.result = EditResponse.Result.Ok
+            return response
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
 

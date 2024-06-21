@@ -44,12 +44,23 @@ class ContentServiceStub(object):
                 request_serializer=content__pb2.CreatePostRequest.SerializeToString,
                 response_deserializer=content__pb2.PostId.FromString,
                 _registered_method=True)
+        self.EditPost = channel.unary_unary(
+                '/content_service.ContentService/EditPost',
+                request_serializer=content__pb2.EditPostRequest.SerializeToString,
+                response_deserializer=content__pb2.EditResponse.FromString,
+                _registered_method=True)
 
 
 class ContentServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def CreatePost(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def EditPost(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -62,6 +73,11 @@ def add_ContentServiceServicer_to_server(servicer, server):
                     servicer.CreatePost,
                     request_deserializer=content__pb2.CreatePostRequest.FromString,
                     response_serializer=content__pb2.PostId.SerializeToString,
+            ),
+            'EditPost': grpc.unary_unary_rpc_method_handler(
+                    servicer.EditPost,
+                    request_deserializer=content__pb2.EditPostRequest.FromString,
+                    response_serializer=content__pb2.EditResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -91,6 +107,33 @@ class ContentService(object):
             '/content_service.ContentService/CreatePost',
             content__pb2.CreatePostRequest.SerializeToString,
             content__pb2.PostId.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def EditPost(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/content_service.ContentService/EditPost',
+            content__pb2.EditPostRequest.SerializeToString,
+            content__pb2.EditResponse.FromString,
             options,
             channel_credentials,
             insecure,

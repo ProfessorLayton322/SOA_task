@@ -44,3 +44,25 @@ async def create_post(db: DatabaseSession, request: CreateCommentRequest, author
         content = request.content
     ))
     return JSONResponse(content={"comment_id" : response.post_id}, status_code=status.HTTP_200_OK)
+
+class EditCommentRequest(BaseModel):
+    new_content: str
+    post_id: int
+@router.put("/api/post")
+async def create_post(db: DatabaseSession, request: EditCommentRequest, authorization: Annotated[str, Header()] = None):
+    auth_result = await authorize(db, authorization)
+    auth_error = check_auth_error(auth_result)
+    if auth_error is not None:
+        return auth_error
+    user_id = auth_result
+    response = grpc_stub.EditPost(EditPostRequest(
+        author_id = user_id,
+        post_id = request.post_id,
+        new_content = request.new_content
+    ))
+    if response.result == EditResponse.Result.NoPermission:
+        return JSONResponse(content={"message" : "You can't edit other people's posts"}, status_code=status.HTTP_403_FORBIDDEN)
+    if response.result == EditResponse.Result.MissingPost:
+        return JSONResponse(content={"message" : "Post with this id does not exist"}, status_code=status.HTTP_404_NOT_FOUND)
+    return JSONResponse(content={"message" : "Edited successfully"}, status_code=status.HTTP_200_OK)
+
